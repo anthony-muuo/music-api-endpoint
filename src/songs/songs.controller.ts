@@ -8,12 +8,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { SongsService } from './songs.service';
-
-type SongProps = {
-  id: number;
-  name: string;
-  artist: string;
-};
+import { CreateSongDto } from './dto/create-song-dto';
 
 @Controller('songs')
 export class SongsController {
@@ -27,8 +22,8 @@ export class SongsController {
     return `this returns the specific song with id ${id}`;
   }
   @Post()
-  create(@Body() song: SongProps) {
-    return this.songsServices.create(song);
+  create(@Body() songDto: CreateSongDto) {
+    return this.songsServices.create(songDto);
   }
   @Put(':id')
   update(@Param('id') id: string) {

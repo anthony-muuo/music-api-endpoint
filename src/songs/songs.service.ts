@@ -1,26 +1,15 @@
 import { Injectable } from '@nestjs/common';
-
-type SongProps = {
-  id: number;
-  name: string;
-  artist: string;
-};
+import { CreateSongDto } from './dto/create-song-dto';
 
 @Injectable()
 export class SongsService {
-  private readonly songs = [
-    {
-      id: 1,
-      name: 'GoodBye',
-      artist: 'Post Malone ft Young Thug',
-    },
-  ];
+  private readonly songs: CreateSongDto[] = [];
 
   findAll() {
     return this.songs;
   }
 
-  create(song: SongProps) {
+  create(song: CreateSongDto) {
     this.songs.push(song);
     return song;
   }
