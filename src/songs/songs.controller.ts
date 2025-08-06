@@ -7,17 +7,24 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { SongsService } from './songs.service';
 import { CreateSongDto } from './dto/create-song-dto';
 import { UpdateSongDto } from './dto/update-song-dto';
+import { IPaginationOptions } from 'nestjs-typeorm-paginate';
+import { PaginationQueryDto } from './dto/pagination-query-dto';
 
 @Controller('songs')
 export class SongsController {
   constructor(private readonly songsServices: SongsService) {}
   @Get()
-  findAll() {
-    return this.songsServices.findAll();
+  findAll(@Query() { page, limit }: PaginationQueryDto) {
+    const options: IPaginationOptions = {
+      page,
+      limit,
+    };
+    return this.songsServices.paginateSongs(options);
   }
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {

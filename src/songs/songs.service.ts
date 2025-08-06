@@ -5,6 +5,8 @@ import { Song } from './entities/song.entity';
 import { Repository } from 'typeorm';
 import { UpdateSongDto } from './dto/update-song-dto';
 
+import { paginate, IPaginationOptions } from 'nestjs-typeorm-paginate';
+
 @Injectable()
 export class SongsService {
   constructor(
@@ -17,10 +19,11 @@ export class SongsService {
     return await this.songRepository.save(song);
   }
 
-  async findAll() {
-    const allSongs = await this.songRepository.find();
-    return allSongs;
-  }
+  //no need for this while using pagination
+  // async findAll() {
+  //   const allSongs = await this.songRepository.find();
+  //   return allSongs;
+  // }
 
   async findOne(id: number) {
     const singleSong = await this.songRepository.findOneBy({ id });
@@ -40,5 +43,11 @@ export class SongsService {
     const song = await this.findOne(id);
     const recordToUpdate = this.songRepository.merge(song, updateSong);
     return await this.songRepository.save(recordToUpdate);
+  }
+
+  paginateSongs(options: IPaginationOptions) {
+    const queryBuilder = this.songRepository.createQueryBuilder('songs');
+    queryBuilder.orderBy('songs.releaseDate', 'DESC');
+    return paginate<Song>(queryBuilder, options);
   }
 }
