@@ -12,11 +12,11 @@ export class Song {
   artists: string[];
 
   @Column({ type: 'date' })
-  releasedDate: Date;
+  releaseDate: Date;
 
   @Column({ type: 'time' })
-  duration: Date;
+  duration: string;
 
-  @Column({ type: 'text' })
-  lyrics: string;
+  @Column({ type: 'text', nullable: true })
+  lyrics: string | null;
 }
