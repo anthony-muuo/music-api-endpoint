@@ -2,20 +2,35 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSongDto } from './dto/create-song-dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Song } from './entities/song.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { UpdateSongDto } from './dto/update-song-dto';
 
 import { paginate, IPaginationOptions } from 'nestjs-typeorm-paginate';
+import { Artist } from 'src/artist/entities/artist.entity';
 
 @Injectable()
 export class SongsService {
   constructor(
     @InjectRepository(Song)
     private readonly songRepository: Repository<Song>,
+    @InjectRepository(Artist)
+    private readonly artistsRepository: Repository<Artist>,
   ) {}
 
   async create(createSongDto: CreateSongDto) {
-    const song = this.songRepository.create(createSongDto);
+    const { artists, ...otherSongData } = createSongDto;
+    const artistEntitites = await this.artistsRepository.findBy({
+      id: In(artists),
+    });
+
+    if (artistEntitites.length !== artists.length) {
+      throw new NotFoundException(`Some artist IDs were not found`);
+    }
+
+    const song = this.songRepository.create({
+      ...otherSongData,
+      artists: artistEntitites,
+    });
     return await this.songRepository.save(song);
   }
 
@@ -41,7 +56,24 @@ export class SongsService {
   }
   async update(id: number, updateSong: UpdateSongDto) {
     const song = await this.findOne(id);
-    const recordToUpdate = this.songRepository.merge(song, updateSong);
+    const { artists, ...otherUpdateData } = updateSong;
+
+    let artistEntities: Artist[] | undefined;
+
+    if (artists) {
+      artistEntities = await this.artistsRepository.findBy({
+        id: In(artists),
+      });
+
+      if (artistEntities.length !== artists.length) {
+        throw new NotFoundException(`Some artist IDs were not found`);
+      }
+    }
+
+    const recordToUpdate = this.songRepository.merge(song, {
+      ...otherUpdateData,
+      ...(artistEntities && { artists: artistEntities }),
+    });
     return await this.songRepository.save(recordToUpdate);
   }
 
