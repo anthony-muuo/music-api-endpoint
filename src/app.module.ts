@@ -5,6 +5,7 @@ import { SongsModule } from './songs/songs.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ArtistModule } from './artist/artist.module';
 import { UserModule } from './user/user.module';
+import { PlaylistModule } from './playlist/playlist.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { UserModule } from './user/user.module';
     }),
     ArtistModule,
     UserModule,
+    PlaylistModule,
   ],
   controllers: [AppController],
   providers: [AppService],
