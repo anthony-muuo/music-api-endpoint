@@ -2,11 +2,14 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { LognInDto } from './dto/login.dto';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
-import { instanceToPlain } from 'class-transformer';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async login(loginUserDto: LognInDto) {
     const user = await this.userService.findOne(loginUserDto);
@@ -17,6 +20,10 @@ export class AuthService {
     if (!passwordMatch)
       throw new UnauthorizedException('Password does not match ');
 
-    return instanceToPlain(user);
+    const { email, id } = user;
+    const payload = { email, id };
+    return {
+      accessToken: this.jwtService.sign(payload),
+    };
   }
 }
