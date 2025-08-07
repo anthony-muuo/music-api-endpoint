@@ -8,16 +8,19 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { SongsService } from './songs.service';
 import { CreateSongDto } from './dto/create-song-dto';
 import { UpdateSongDto } from './dto/update-song-dto';
 import { IPaginationOptions } from 'nestjs-typeorm-paginate';
 import { PaginationQueryDto } from './dto/pagination-query-dto';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 @Controller('songs')
 export class SongsController {
   constructor(private readonly songsServices: SongsService) {}
+  @UseGuards(JwtGuard)
   @Get()
   findAll(@Query() { page, limit }: PaginationQueryDto) {
     const options: IPaginationOptions = {

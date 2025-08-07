@@ -20,8 +20,7 @@ export class AuthService {
     if (!passwordMatch)
       throw new UnauthorizedException('Password does not match ');
 
-    const { email, id } = user;
-    const payload = { email, id };
+    const payload = { email: user.email, sub: user.id };
     return {
       accessToken: this.jwtService.sign(payload),
     };
